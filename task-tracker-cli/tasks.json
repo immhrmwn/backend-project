@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "description": "Belajar CLI",
+    "status": "todo",
+    "createdAt": "2025-12-17T08:54:48.589Z",
+    "updatedAt": "2025-12-17T08:54:48.590Z"
+  },
+  {
+    "id": 2,
+    "description": "Belajar Membaca",
+    "status": "done",
+    "createdAt": "2025-12-17T08:55:07.738Z",
+    "updatedAt": "2025-12-17T09:05:02.007Z"
+  },
+  {
+    "id": 3,
+    "description": "Menggulingkan pemerintah",
+    "status": "in-progress",
+    "createdAt": "2025-12-17T09:03:20.029Z",
+    "updatedAt": "2025-12-17T09:04:46.211Z"
+  }
+]
