@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+const {readTask, writeTask} = require('./src/taskStore')
+
 const readline = require("readline");
 const { version } = require("./package.json");
 
-const DATA_FILE = path.join(__dirname, "tasks.json");
 
 // ---------- Utils ----------
 function ask(question) {
@@ -20,17 +19,6 @@ function ask(question) {
       resolve(answer.trim().toLowerCase());
     });
   });
-}
-
-function loadTasks() {
-  if (!fs.existsSync(DATA_FILE)) {
-    return [];
-  }
-  return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-}
-
-function saveTasks(tasks) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(tasks, null, 2));
 }
 
 function getNextId(tasks) {
@@ -91,7 +79,7 @@ const aliases = {
 
 const command = aliases[args[0]] ?? args[0];
 
-const tasks = loadTasks();
+const tasks = readTask();
 
 // tasks.sort(
 //   (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -115,7 +103,7 @@ const tasks = loadTasks();
       };
 
       tasks.push(task);
-      saveTasks(tasks);
+      writeTask(tasks);
 
       console.log(`✅ Task added successfully (ID: ${task.id})`);
       process.exit(0);
@@ -139,7 +127,7 @@ const tasks = loadTasks();
 
       task.description = newDescription;
       task.updatedAt = now();
-      saveTasks(tasks);
+      writeTask(tasks);
 
       console.log("✅ Task updated");
       process.exit(0);
@@ -167,7 +155,7 @@ const tasks = loadTasks();
       }
 
       tasks.splice(index, 1);
-      saveTasks(tasks);
+      writeTask(tasks);
 
       console.log("🗑️ Task deleted");
       process.exit(0);
@@ -190,7 +178,7 @@ const tasks = loadTasks();
 
       task.status = command === "mark-done" ? "done" : "in-progress";
       task.updatedAt = now();
-      saveTasks(tasks);
+      writeTask(tasks);
 
       console.log(`✅ Task marked as ${task.status}`);
       process.exit(0);
