@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const {readTask, writeTask} = require('./src/taskStore')
-const {addTask, deleteTask, listTasks, updateTask} = require('./src/taskService');
+const {addTask, deleteTask, listTasks, updateTask, updateStatus} = require('./src/taskService');
 
 const { version } = require("./package.json");
 const { isValidId, now, printTasks } = require('./src/formatter');
@@ -9,22 +9,22 @@ const { isValidId, now, printTasks } = require('./src/formatter');
 // ---------- Utils ----------
 function showHelp() {
   console.log(`
-Task Tracker CLI
+  Task Tracker CLI
 
-Usage:
-  task-cli add "description"
-  task-cli update <id> "description"
-  task-cli delete <id>
-  task-cli mark-in-progress <id>
-  task-cli mark-done <id>
-  task-cli list
-  task-cli list done
-  task-cli list todo
-  task-cli list in-progress
+  Usage:
+    task-cli add "description"
+    task-cli update <id> "description"
+    task-cli delete <id>
+    task-cli mark-in-progress <id>
+    task-cli mark-done <id>
+    task-cli list
+    task-cli list done
+    task-cli list todo
+    task-cli list in-progress
 
-Options:
-  -h, --help       Show help
-  -v, --version    Show version
+  Options:
+    -h, --help       Show help
+    -v, --version    Show version
 `);
 }
 // ---------- Commands ----------
@@ -48,12 +48,6 @@ const aliases = {
 };
 
 const command = aliases[args[0]] ?? args[0];
-
-const tasks = readTask();
-
-// tasks.sort(
-//   (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-// );
 
 function handleError(err) {
   switch (err.message) {
@@ -117,23 +111,11 @@ function handleError(err) {
       case "mark-in-progress":
       case "mark-done": {
         const id = Number(args[1]);
+        const status = command === "mark-done" ? "done" : "in-progress";
 
-        if (!isValidId(id)) {
-          console.log("❌ Invalid task ID");
-          process.exit(1);
-        }
-        const task = tasks.find(t => t.id === id);
-
-        if (!task) {
-          console.log("❌ Task not found");
-          process.exit(1);
-        }
-
-        task.status = command === "mark-done" ? "done" : "in-progress";
-        task.updatedAt = now();
-        writeTask(tasks);
-
-        console.log(`✅ Task marked as ${task.status}`);
+        updateStatus(status, id)
+        
+        console.log(`✅ Task marked as ${status}`);
         process.exit(0);
       }
 
@@ -147,14 +129,14 @@ function handleError(err) {
 
       default:
         console.log(`
-    Available commands:
-      task-cli add "description"
-      task-cli update <id> "new description"
-      task-cli delete <id>
-      task-cli mark-in-progress <id>
-      task-cli mark-done <id>
-      task-cli list
-      task-cli list todo|in-progress|done
+Available commands:
+  task-cli add "description"
+  task-cli update <id> "new description"
+  task-cli delete <id>
+  task-cli mark-in-progress <id>
+  task-cli mark-done <id>
+  task-cli list
+  task-cli list todo|in-progress|done
     `);
     }
   } catch (error) {
