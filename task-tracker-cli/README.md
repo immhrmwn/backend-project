@@ -1,6 +1,6 @@
 # Task Tracker CLI
 
-A simple **Command Line Interface (CLI)** application to manage tasks (to-do list) using **Node.js**, built as part of the [roadmap.sh Task Tracker project](https://roadmap.sh/projects/task-tracker)  (https://roadmap.sh/projects/task-tracker).
+A simple **Command Line Interface (CLI)** application to manage tasks (to-do list) using **Node.js**, built as part of the [roadmap.sh Task Tracker project](https://roadmap.sh/projects/task-tracker).
 
 This project focuses on:
 
