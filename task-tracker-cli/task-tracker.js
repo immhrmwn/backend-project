@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-const {readTask, writeTask} = require('./src/taskStore')
-const {addTask, deleteTask, listTasks, updateTask, updateStatus} = require('./src/taskService');
+const store = require("./src/taskStore");
+const { createTaskService } = require("./src/taskService");
 
 const { version } = require("./package.json");
-const { isValidId, now, printTasks } = require('./src/formatter');
+const { isValidId, now, printTasks, ask } = require('./src/formatter');
 
+const taskService = createTaskService(store);
 // ---------- Utils ----------
 function showHelp() {
   console.log(`
@@ -27,6 +28,7 @@ function showHelp() {
     -v, --version    Show version
 `);
 }
+
 // ---------- Commands ----------
 const args = process.argv.slice(2);
 
@@ -83,7 +85,7 @@ function handleError(err) {
     switch (command) {
       case "add": {
         const description = args.slice(1).join(" ");
-        const task = addTask(description);
+        const task = taskService.addTask(description);
 
         console.log(`✅ Task added successfully (ID: ${task.id})`);
         process.exit(0);
@@ -93,7 +95,7 @@ function handleError(err) {
         const id = Number(args[1]);
         const newDescription = args.slice(2).join(" ");
 
-        updateTask(newDescription, id);
+        taskService.updateTask(newDescription, id);
 
         console.log("✅ Task updated");
         process.exit(0);
@@ -102,7 +104,12 @@ function handleError(err) {
       case "delete": {
         const id = Number(args[1]);
 
-        await deleteTask(id);
+        const answer = await ask(`Are you sure you want to delete task ID ${id}? (y/n): `);
+        if (answer !== 'y') {
+          throw new Error("DELETION_CANCELLED");
+        }
+
+        await taskService.deleteTask(id);
 
         console.log("🗑️ Task deleted");
         process.exit(0);
@@ -113,7 +120,7 @@ function handleError(err) {
         const id = Number(args[1]);
         const status = command === "mark-done" ? "done" : "in-progress";
 
-        updateStatus(status, id)
+        taskService.updateStatus(status, id)
         
         console.log(`✅ Task marked as ${status}`);
         process.exit(0);
@@ -121,7 +128,7 @@ function handleError(err) {
 
       case "list": {
         const status = args[1];
-        const filteredTasks = listTasks(status);
+        const filteredTasks = taskService.listTasks(status);
 
         printTasks(filteredTasks);
         process.exit(0);

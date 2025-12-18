@@ -1,111 +1,109 @@
-const { getNextId, now, isValidId, ask } = require("./formatter");
-const {readTask, writeTask} = require("./taskStore");
+const { getNextId, now, isValidId } = require("./formatter");
 
-function addTask(description) {
-  if (!description) {
-    throw new Error("DESCRIPTION_REQUIRED");
+function createTaskService(store) {
+  function addTask(description) {
+    if (!description) {
+      throw new Error("DESCRIPTION_REQUIRED");
+    }
+
+    const tasks = store.readTask();
+
+    const task = {
+      id: getNextId(tasks),
+      description,
+      status: "todo",
+      createdAt: now(),
+      updatedAt: now()
+    };
+
+    tasks.push(task);
+    store.writeTask(tasks);
+
+    return task;
   }
 
-  const tasks = readTask();
+  function updateTask(description, id) {
+    if (!id) {
+      throw new Error("ID_REQUIRED");
+    }
 
-  const task = {
-    id: getNextId(tasks),
-    description,
-    status: "todo",
-    createdAt: now(),
-    updatedAt: now()
+    if (!isValidId(id)) {
+      throw new Error("INVALID_ID");
+    }
+
+    const tasks = store.readTask();
+    const task = tasks.find(item => item.id === id);
+
+    if (!task) {
+      throw new Error("TASK_NOT_FOUND");
+    }
+
+    task.description = description;
+    task.updatedAt = now();
+
+    store.writeTask(tasks);
+  }
+
+  function updateStatus(status, id) {
+    if (!id) {
+      throw new Error("ID_REQUIRED");
+    }
+
+    if (!isValidId(id)) {
+      throw new Error("INVALID_ID");
+    }
+
+    const tasks = store.readTask();
+    const task = tasks.find(item => item.id === id);
+
+    if (!task) {
+      throw new Error("TASK_NOT_FOUND");
+    }
+
+    task.status = status
+    task.updatedAt = now();
+
+    store.writeTask(tasks);
   };
 
-  tasks.push(task);
-  writeTask(tasks);
 
-  return task;
-}
+  async function deleteTask(id) {
+    if (!id) {
+      throw new Error("ID_REQUIRED");
+    }
 
-function updateTask(description, id) {
-  if (!id) {
-    throw new Error("ID_REQUIRED");
-  }
+    if (!isValidId(id)) {
+      throw new Error("INVALID_ID");
+    }
 
-  if (!isValidId(id)) {
-    throw new Error("INVALID_ID");
-  }
+    const tasks = store.readTask();
+    const index = tasks.findIndex(item => item.id === id);
 
-  const tasks = readTask();
-  const task = tasks.find(item => item.id === id);
+    if (index === -1) {
+      throw new Error("TASK_NOT_FOUND");
+    }
 
-  if (!task) {
-    throw new Error("TASK_NOT_FOUND");
-  }
+    tasks.splice(index, 1);
+    store.writeTask(tasks);
+  };
 
-  task.description = description;
-  task.updatedAt = now();
+  function listTasks(status) {
+    const tasks = store.readTask();
 
-  writeTask(tasks);
-}
+    if (!status) {
+      return tasks;
+    }
 
-function updateStatus(status, id) {
-  if (!id) {
-    throw new Error("ID_REQUIRED");
-  }
+    return tasks.filter(item => item.status === status);
+  };
 
-  if (!isValidId(id)) {
-    throw new Error("INVALID_ID");
-  }
+  return {
+    addTask,
+    updateTask,
+    updateStatus,
+    deleteTask,
+    listTasks
+  };
+};
 
-  const tasks = readTask();
-  const task = tasks.find(item => item.id === id);
-
-  if (!task) {
-    throw new Error("TASK_NOT_FOUND");
-  }
-
-  task.status = status
-  task.updatedAt = now();
-
-  writeTask(tasks);
-}
-
-
-async function deleteTask(id) {
-  if (!id) {
-    throw new Error("ID_REQUIRED");
-  }
-
-  if (!isValidId(id)) {
-    throw new Error("INVALID_ID");
-  }
-
-  const tasks = readTask();
-  const index = tasks.findIndex(item => item.id === id);
-
-  if (index === -1) {
-    throw new Error("TASK_NOT_FOUND");
-  }
-
-  const answer = await ask(`Are you sure you want to delete task ID ${id}? (y/n): `);
-  if (answer !== 'y') {
-    throw new Error("DELETION_CANCELLED");
-  }
-
-  tasks.splice(index, 1);
-  writeTask(tasks);
-}
-
-function listTasks(status) {
-  const tasks = readTask()
-
-  if (!status) {
-    return tasks;
-  }
-
-  return tasks.filter(item => item.status === status);
-}
-
-module.exports = {
-  addTask,
-  updateTask,
-  updateStatus,
-  deleteTask,
-  listTasks
-}
+module.exports = { createTaskService };
