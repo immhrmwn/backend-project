@@ -1,41 +1,14 @@
 #!/usr/bin/env node
 
 const {readTask, writeTask} = require('./src/taskStore')
-const {addTask} = require('./src/taskService');
+const {addTask, deleteTask} = require('./src/taskService');
 
-const readline = require("readline");
 const { version } = require("./package.json");
-
+const { isValidId, now } = require('./src/formatter');
 
 // ---------- Utils ----------
-function ask(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  return new Promise(resolve => {
-    rl.question(question, answer => {
-      rl.close();
-      resolve(answer.trim().toLowerCase());
-    });
-  });
-}
-
-function getNextId(tasks) {
-  return tasks.length === 0 ? 1 : Math.max(...tasks.map(t => t.id)) + 1;
-}
-
-function now() {
-  return new Date().toISOString();
-}
-
 function pad(str, length) {
   return String(str).padEnd(length);
-}
-
-function isValidId(id) {
-  return Number.isInteger(id) && id > 0;
 }
 
 function showHelp() {
@@ -92,6 +65,22 @@ function handleError(err) {
       console.error("❌ Description is required");
       process.exit(1);
 
+    case "ID_REQUIRED":
+      console.error("❌ Task ID is required");
+      process.exit(1);
+
+    case "INVALID_ID":
+      console.error("❌ Invalid task ID");
+      process.exit(1);
+
+    case "TASK_NOT_FOUND":
+      console.error("❌ Task not found");
+      process.exit(1);
+    
+    case "DELETION_CANCELLED":
+      console.log("❌ Deletion cancelled");
+      process.exit(0);
+
     default:
       console.error("❌ Error:", err.message);
       process.exit(1);
@@ -137,26 +126,7 @@ function handleError(err) {
       case "delete": {
         const id = Number(args[1]);
 
-        if (!isValidId(id)) {
-          console.log("❌ Invalid task ID");
-          process.exit(1);
-        }
-
-        const index = tasks.findIndex(t => t.id === id);
-
-        if (index === -1) {
-          console.log("❌ Task not found");
-          process.exit(1);
-        }
-
-        const answer = await ask(`Are you sure you want to delete task ID ${id}? (y/n): `);
-        if (answer !== 'y') {
-          console.log("❌ Deletion cancelled");
-          process.exit(0);
-        }
-
-        tasks.splice(index, 1);
-        writeTask(tasks);
+        await deleteTask(id);
 
         console.log("🗑️ Task deleted");
         process.exit(0);

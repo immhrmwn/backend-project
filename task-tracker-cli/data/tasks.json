@@ -1,12 +1,5 @@
 [
   {
-    "id": 1,
-    "description": "Test 2",
-    "status": "todo",
-    "createdAt": "2025-12-18T02:55:01.380Z",
-    "updatedAt": "2025-12-18T02:55:01.381Z"
-  },
-  {
     "id": 2,
     "description": "Test 3",
     "status": "todo",
