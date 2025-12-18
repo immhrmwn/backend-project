@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 const {readTask, writeTask} = require('./src/taskStore')
-const {addTask, deleteTask, listTasks} = require('./src/taskService');
+const {addTask, deleteTask, listTasks, updateTask} = require('./src/taskService');
 
 const { version } = require("./package.json");
-const { isValidId, now, pad, printTasks } = require('./src/formatter');
+const { isValidId, now, printTasks } = require('./src/formatter');
 
 // ---------- Utils ----------
 function showHelp() {
@@ -97,23 +97,9 @@ function handleError(err) {
 
       case "update": {
         const id = Number(args[1]);
-
-        if (!isValidId(id)) {
-          console.log("❌ Invalid task ID");
-          process.exit(1);
-        }
-
         const newDescription = args.slice(2).join(" ");
 
-        const task = tasks.find(t => t.id === id);
-        if (!task) {
-          console.log("❌ Task not found");
-          process.exit(1);
-        }
-
-        task.description = newDescription;
-        task.updatedAt = now();
-        writeTask(tasks);
+        updateTask(newDescription, id);
 
         console.log("✅ Task updated");
         process.exit(0);

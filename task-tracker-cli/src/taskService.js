@@ -22,6 +22,29 @@ function addTask(description) {
   return task;
 }
 
+function updateTask(description, id) {
+  if (!id) {
+    throw new Error("ID_REQUIRED");
+  }
+
+  if (!isValidId(id)) {
+    throw new Error("INVALID_ID");
+  }
+
+  const tasks = readTask();
+  const task = tasks.find(item => item.id === id);
+
+  if (!task) {
+    throw new Error("TASK_NOT_FOUND");
+  }
+
+  task.description = description;
+  task.updatedAt = now();
+
+  writeTask(tasks);
+}
+
+
 async function deleteTask(id) {
   if (!id) {
     throw new Error("ID_REQUIRED");
@@ -59,6 +82,7 @@ function listTasks(status) {
 
 module.exports = {
   addTask,
+  updateTask,
   deleteTask,
   listTasks
 }
