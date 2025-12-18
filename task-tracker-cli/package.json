@@ -3,5 +3,11 @@
   "version": "1.0.0",
   "bin": {
     "task-cli": "./task-tracker.js"
+  },
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.16"
   }
 }
