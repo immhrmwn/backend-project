@@ -1,30 +1,31 @@
 # Task Tracker CLI
 
-A simple **Command Line Interface (CLI)** application to manage tasks (to-do list) using **Node.js**, built as part of the [roadmap.sh Task Tracker project](https://roadmap.sh/projects/task-tracker).
+A simple **Command Line Interface (CLI)** application to manage tasks (to-do list) using **Node.js**. This project is built as part of the [roadmap.sh Task Tracker project](https://roadmap.sh/projects/task-tracker).
 
-This project focuses on:
+The goal of this project is to practice:
 
 * Working with command-line arguments
 * Reading and writing data to a JSON file
 * Implementing basic CRUD operations
-* Managing task status
+* Applying clean code structure and unit testing
 
 ---
 
 ## 📦 Features
 
 * Add new tasks
-* Update existing tasks
-* Delete tasks
-* Mark tasks as `todo`, `in-progress`, or `done`
+* Update task status (`todo`, `in-progress`, `done`)
+* Delete tasks with confirmation
 * List all tasks or filter by status
 * Persistent storage using a local JSON file
+* Clear error handling with exit codes
+* Unit-tested service layer
 
 ---
 
 ## 🛠️ Requirements
 
-* Node.js (v14 or newer recommended)
+* Node.js **v14+** (v18+ recommended)
 
 Check your Node version:
 
@@ -37,9 +38,25 @@ node -v
 ## 📂 Project Structure
 
 ```bash
-task-tracker/
-├── task-cli.js      # Main CLI script
-├── tasks.json       # Task data (auto-generated)
+task-tracker-cli/
+├── src/
+│   ├── cli.js                 # CLI entry point
+│   ├── taskService.js         # Business logic
+│   ├── taskStore.js           # File-based storage
+│   ├── formatter/
+│   │   └── taskFormatter.js   # CLI output formatter
+│   └── utils/
+│       ├── id.js              # ID helper
+│       ├── time.js            # Time helper
+│       ├── validator.js       # Input validation
+│       └── string.js          # String utilities
+├── tests/
+│   ├── taskService.add.test.js
+│   ├── taskService.delete.test.js
+│   └── taskService.update.test.js
+├── data/
+│   └── tasks.json             # Task data (auto-created)
+├── package.json
 └── README.md
 ```
 
@@ -47,35 +64,30 @@ task-tracker/
 
 ## 🚀 How to Run
 
-### Option 1: Run using Node.js (Recommended)
+### 1️⃣ Install dependencies
 
 ```bash
-node task-cli.js <command>
+npm install
 ```
 
-Example:
+### 2️⃣ Link the CLI globally
 
 ```bash
-node task-cli.js add "Learn Node.js"
-node task-cli.js list
+npm link
 ```
 
----
-
-### Option 2: Run as a CLI command (Optional)
-
-> This step is optional and not required for the roadmap.sh project.
-
-1. Make the file executable:
+### 3️⃣ Use the CLI
 
 ```bash
-chmod +x task-cli.js
+task-cli add "Learn Node.js"
+task-cli list
+task-cli list done
 ```
 
-2. Run directly:
+> You can also run it directly without linking:
 
 ```bash
-./task-cli.js add "Learn CLI"
+node src/cli.js list
 ```
 
 ---
@@ -85,31 +97,27 @@ chmod +x task-cli.js
 ### ➕ Add a Task
 
 ```bash
-node task-cli.js add "Task description"
-```
-
-### ✏️ Update a Task
-
-```bash
-node task-cli.js update <id> "New description"
+task-cli add "Task description"
 ```
 
 ### 🗑️ Delete a Task
 
 ```bash
-node task-cli.js delete <id>
+task-cli delete <id>
 ```
+
+You will be asked for confirmation before deletion.
 
 ### ⏳ Mark Task as In Progress
 
 ```bash
-node task-cli.js mark-in-progress <id>
+task-cli mark-in-progress <id>
 ```
 
 ### ✅ Mark Task as Done
 
 ```bash
-node task-cli.js mark-done <id>
+task-cli mark-done <id>
 ```
 
 ### 📋 List Tasks
@@ -117,22 +125,22 @@ node task-cli.js mark-done <id>
 List all tasks:
 
 ```bash
-node task-cli.js list
+task-cli list
 ```
 
 Filter by status:
 
 ```bash
-node task-cli.js list todo
-node task-cli.js list in-progress
-node task-cli.js list done
+task-cli list todo
+task-cli list in-progress
+task-cli list done
 ```
 
 ---
 
 ## 🗂️ Task Data Format
 
-Each task is stored in `tasks.json` with the following structure:
+Tasks are stored in `data/tasks.json` using the following structure:
 
 ```json
 {
@@ -146,35 +154,53 @@ Each task is stored in `tasks.json` with the following structure:
 
 ---
 
-## ⚠️ Error Handling
+## ⚠️ Error Codes
 
-* Displays an error message if a task ID is not found
-* Prevents adding tasks without a description
-* Handles empty task lists gracefully
+| Code                 | Description                        |
+| -------------------- | ---------------------------------- |
+| ID_REQUIRED          | Task ID is required                |
+| INVALID_ID           | Task ID must be a positive integer |
+| TASK_NOT_FOUND       | Task does not exist                |
+| DESCRIPTION_REQUIRED | Task description is required       |
+| DELETION_CANCELLED   | Task deletion was cancelled        |
 
 ---
 
-## 🧪 Example Usage
+## 🔚 Exit Codes
+
+| Code | Meaning                        |
+| ---- | ------------------------------ |
+| 0    | Success                        |
+| 1    | User input or validation error |
+| 2    | System or unexpected error     |
+
+---
+
+## 🧪 Testing
+
+Run unit tests:
 
 ```bash
-node task-cli.js add "Build a task tracker"
-node task-cli.js add "Test CLI app"
-node task-cli.js list
-node task-cli.js mark-done 1
-node task-cli.js list done
+npm test
 ```
+
+Tests focus on:
+
+* Task service logic
+* Error handling scenarios
+* Mocked storage layer
 
 ---
 
 ## 📈 Possible Improvements
 
-* Sort tasks by creation date
-* Add command aliases
-* Improve CLI output formatting
-* Add unit tests
+* JSON output mode (`--json`)
+* Task sorting and searching
+* Colored CLI output
+* Configuration for custom data file path
 
 ---
 
 ## 📝 License
 
-This project is for learning purposes only.
+This project is created for learning purposes as part of the roadmap.sh curriculum.
