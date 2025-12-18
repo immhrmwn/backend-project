@@ -47,7 +47,18 @@ async function deleteTask(id) {
   writeTask(tasks);
 }
 
+function listTasks(status) {
+  const tasks = readTask()
+
+  if (!status) {
+    return tasks;
+  }
+
+  return tasks.filter(item => item.status === status);
+}
+
 module.exports = {
   addTask,
-  deleteTask
+  deleteTask,
+  listTasks
 }

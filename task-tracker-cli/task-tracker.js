@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 
 const {readTask, writeTask} = require('./src/taskStore')
-const {addTask, deleteTask} = require('./src/taskService');
+const {addTask, deleteTask, listTasks} = require('./src/taskService');
 
 const { version } = require("./package.json");
-const { isValidId, now } = require('./src/formatter');
+const { isValidId, now, pad, printTasks } = require('./src/formatter');
 
 // ---------- Utils ----------
-function pad(str, length) {
-  return String(str).padEnd(length);
-}
-
 function showHelp() {
   console.log(`
 Task Tracker CLI
@@ -156,30 +152,10 @@ function handleError(err) {
       }
 
       case "list": {
-        const filter = args[1];
-        const filteredTasks = filter
-          ? tasks.filter(t => t.status === filter)
-          : tasks;
+        const status = args[1];
+        const filteredTasks = listTasks(status);
 
-        if (filteredTasks.length === 0) {
-          console.log("📭 No tasks found");
-          process.exit(0);
-        }
-
-        console.log(
-          pad("ID", 4),
-          pad("STATUS", 14),
-          "DESCRIPTION",
-        )
-
-        filteredTasks.forEach(task => {
-          console.log(
-            pad(task.id, 4),
-            pad(task.status, 14),
-            task.description,
-          );
-        });
-
+        printTasks(filteredTasks);
         process.exit(0);
       }
 
