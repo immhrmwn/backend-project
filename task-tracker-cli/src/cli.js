@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-const store = require("./src/taskStore");
-const { createTaskService } = require("./src/taskService");
+const store = require("./taskStore");
+const { createTaskService } = require("./taskService");
 
-const { version } = require("./package.json");
-const { isValidId, now, printTasks, ask } = require('./src/formatter');
+const { version } = require("../package.json");
+const { printTasks } = require('./formatter');
+const { ask } = require("./utils/prompt");
 
 const taskService = createTaskService(store);
 // ---------- Utils ----------

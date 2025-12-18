@@ -2,7 +2,7 @@
   "name": "task-tracker-cli",
   "version": "1.0.0",
   "bin": {
-    "task-cli": "./task-tracker.js"
+    "task-cli": "./src/cli.js"
   },
   "scripts": {
     "test": "vitest"

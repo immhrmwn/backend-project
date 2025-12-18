@@ -1,34 +1,4 @@
-const readline = require("readline");
-
-function getNextId(tasks) {
-  return tasks.length === 0 ? 1 : Math.max(...tasks.map(t => t.id)) + 1;
-}
-
-function now() {
-  return new Date().toISOString();
-}
-
-function ask(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  return new Promise(resolve => {
-    rl.question(question, answer => {
-      rl.close();
-      resolve(answer.trim().toLowerCase());
-    });
-  });
-}
-
-function isValidId(id) {
-  return Number.isInteger(id) && id > 0;
-}
-
-function pad(str, length) {
-  return String(str).padEnd(length);
-}
+const { pad } = require("./utils/string");
 
 function printTasks(tasks) {
   if (tasks.length === 0) {
@@ -52,10 +22,5 @@ function printTasks(tasks) {
 }
 
 module.exports = {
-  getNextId,
-  now,
-  ask,
-  isValidId,
-  pad,
   printTasks
 }

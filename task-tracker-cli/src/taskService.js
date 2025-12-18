@@ -1,4 +1,6 @@
-const { getNextId, now, isValidId } = require("./formatter");
+const { getNextId } = require("./utils/id");
+const { now } = require("./utils/time");
+const { isValidId } = require("./utils/validator");
 
 function createTaskService(store) {
   function addTask(description) {
