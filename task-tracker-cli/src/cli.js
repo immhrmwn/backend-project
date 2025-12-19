@@ -106,10 +106,13 @@ function getFlagValue(flag) {
 
       case "delete": {
         const id = Number(args[1]);
+        const skipConfirm = args.includes("--yes");
 
-        const answer = await ask(`Are you sure you want to delete task ID ${id}? (y/n): `);
-        if (answer !== 'y') {
-          throw new Error("DELETION_CANCELLED");
+        if (!skipConfirm) {
+          const answer = await ask(`Are you sure you want to delete task ID ${id}? (y/n): `);
+          if (answer !== 'y') {
+            throw new Error("DELETION_CANCELLED");
+          }
         }
 
         await taskService.deleteTask(id);
