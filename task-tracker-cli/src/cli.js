@@ -19,10 +19,7 @@ function showHelp() {
     task-cli delete <id>
     task-cli mark-in-progress <id>
     task-cli mark-done <id>
-    task-cli list
-    task-cli list done
-    task-cli list todo
-    task-cli list in-progress
+    task-cli list [--status <status>] [--json]
 
   Options:
     -h, --help       Show help
@@ -80,6 +77,11 @@ function handleError(err) {
   }
 }
 
+function getFlagValue(flag) {
+  const index = args.indexOf(flag);
+  if (index === -1) return null;
+  return args[index + 1];
+}
 
 (async () => {
   try {
@@ -128,8 +130,15 @@ function handleError(err) {
       }
 
       case "list": {
-        const status = args[1];
+        const isJson = args.includes("--json");
+
+        const status = getFlagValue("--status");
         const filteredTasks = taskService.listTasks(status);
+
+        if (isJson) {
+          console.log(JSON.stringify(filteredTasks, null, 2));
+          process.exit(0);
+        }
 
         printTasks(filteredTasks);
         process.exit(0);
