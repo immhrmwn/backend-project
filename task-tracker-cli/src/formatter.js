@@ -28,6 +28,16 @@ function printTasks(tasks) {
   });
 }
 
+function printStats(stats) {
+  console.log(`
+Total tasks     : ${stats.total}
+Todo            : ${stats.todo}
+In progress     : ${stats.inProgress}
+Done            : ${stats.done}
+`.trim());
+}
+
 module.exports = {
-  printTasks
+  printTasks,
+  printStats,
 }

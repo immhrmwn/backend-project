@@ -99,12 +99,24 @@ function createTaskService(store) {
     return tasks.filter(item => item.status === status);
   };
 
+  function getStats() {
+    const tasks = store.readTask();
+
+    return {
+      total: tasks.length,
+      todo: tasks.filter(item => item.status === 'todo').length,
+      inProgress: tasks.filter(item => item.status === 'in-progress').length,
+      done: tasks.filter(item => item.status === 'done').length,
+    }
+  }
+
   return {
     addTask,
     updateTask,
     updateStatus,
     deleteTask,
-    listTasks
+    listTasks,
+    getStats
   };
 };
 

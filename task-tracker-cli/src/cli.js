@@ -4,7 +4,7 @@ const store = require("./taskStore");
 const { createTaskService } = require("./taskService");
 
 const { version } = require("../package.json");
-const { printTasks } = require('./formatter');
+const { printTasks, printStats } = require('./formatter');
 const { ask } = require("./utils/prompt");
 
 const taskService = createTaskService(store);
@@ -144,6 +144,18 @@ function getFlagValue(flag) {
         }
 
         printTasks(filteredTasks);
+        process.exit(0);
+      }
+
+      case "stats": {
+        const stats = taskService.getStats();
+
+        if (args.includes("--json")) {
+          console.log(JSON.stringify(stats, null, 2));
+          process.exit(0);
+        }
+
+        printStats(stats);
         process.exit(0);
       }
 
